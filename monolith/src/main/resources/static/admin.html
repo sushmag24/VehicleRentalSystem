@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — VehicleRent</title>
+  <meta name="description" content="Admin panel — manage vehicles, reservations, and users.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a class="nav-brand" href="#">
+      <span class="brand-icon">🚗</span>
+      VehicleRent
+      <span class="admin-badge">Admin</span>
+    </a>
+    <div class="nav-right">
+      <button class="btn btn-sm btn-secondary" onclick="logout()">Sign Out</button>
+    </div>
+  </nav>
+
+  <div class="page">
+
+    <!-- Stats Row -->
+    <div id="stats-row" class="stats-row">
+      <div class="stat-card">
+        <span class="stat-icon">🚗</span>
+        <div><div class="stat-label">Total Vehicles</div><div class="stat-value" id="stat-vehicles">—</div></div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">📋</span>
+        <div><div class="stat-label">Reservations</div><div class="stat-value" id="stat-reservations">—</div></div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">👥</span>
+        <div><div class="stat-label">Customers</div><div class="stat-value" id="stat-users">—</div></div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-icon">✅</span>
+        <div><div class="stat-label">Available Now</div><div class="stat-value" id="stat-available">—</div></div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="panel-vehicles"     onclick="switchTab('panel-vehicles')">🚗 Vehicles</button>
+      <button class="tab-btn"       data-tab="panel-reservations"  onclick="switchTab('panel-reservations')">📋 Reservations</button>
+      <button class="tab-btn"       data-tab="panel-users"         onclick="switchTab('panel-users')">👥 Users</button>
+    </div>
+
+    <!-- ── Panel: Vehicles ── -->
+    <div id="panel-vehicles" class="tab-panel active">
+      <div class="card">
+        <div class="card-title">➕ Add New Vehicle</div>
+        <div class="add-form">
+          <div class="form-group">
+            <label for="v-name">Vehicle Name</label>
+            <input type="text" id="v-name" placeholder="e.g. Toyota Camry">
+          </div>
+          <div class="form-group">
+            <label for="v-category">Category</label>
+            <select id="v-category">
+              <option value="FOUR_WHEELER">Four Wheeler</option>
+              <option value="TWO_WHEELER">Two Wheeler</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="v-type">Type</label>
+            <select id="v-type">
+              <option value="Sedan">Sedan</option>
+              <option value="SUV">SUV</option>
+              <option value="Truck">Truck</option>
+              <option value="Van">Van</option>
+              <option value="Luxury">Luxury</option>
+              <option value="Motorcycle">Motorcycle</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="v-price">Price/Day (₹)</label>
+            <input type="number" id="v-price" placeholder="e.g. 2000" min="1" step="0.01">
+          </div>
+          <div class="form-group">
+            <label for="v-rating">Rating</label>
+            <input type="number" id="v-rating" placeholder="e.g. 4.5" min="0" max="5" step="0.1">
+          </div>
+          <div class="form-group">
+            <label for="v-image">Image URL</label>
+            <input type="text" id="v-image" placeholder="URL to vehicle image">
+          </div>
+          <div class="form-group">
+            <label for="v-status">Status</label>
+            <select id="v-status">
+              <option value="AVAILABLE">AVAILABLE</option>
+              <option value="MAINTENANCE">MAINTENANCE</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" onclick="addVehicle()">Add Vehicle</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🚗 All Vehicles</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>ID</th><th>Name</th><th>Type</th><th>Price/Day</th><th>Status</th><th>Actions</th></tr>
+            </thead>
+            <tbody id="admin-vehicles-tbody">
+              <tr><td colspan="6" class="loading-cell"><div class="loading-spinner small"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Panel: Reservations ── -->
+    <div id="panel-reservations" class="tab-panel">
+      <div class="card">
+        <div class="card-title">📋 All Reservations</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Customer</th>
+                <th>Vehicle</th>
+                <th>Dates</th>
+                <th>Payment</th>
+                <th>Original</th>
+                <th>Discount</th>
+                <th>Final</th>
+                <th>Status</th>
+                <th>Update</th>
+              </tr>
+            </thead>
+            <tbody id="admin-res-tbody">
+              <tr><td colspan="6" class="loading-cell"><div class="loading-spinner small"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Panel: Users ── -->
+    <div id="panel-users" class="tab-panel">
+      <div class="card">
+        <div class="card-title">👥 Registered Users</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>ID</th><th>Name</th><th>Email</th><th>License</th><th>Role</th></tr>
+            </thead>
+            <tbody id="admin-users-tbody">
+              <tr><td colspan="5" class="loading-cell"><div class="loading-spinner small"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /page -->
+
+  <!-- Edit Vehicle Modal -->
+  <div id="edit-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <span class="modal-title">Edit Vehicle</span>
+        <button class="modal-close" onclick="closeEditModal()">✕</button>
+      </div>
+      <input type="hidden" id="edit-id">
+      <div class="form-group">
+        <label for="edit-name">Vehicle Name</label>
+        <input type="text" id="edit-name">
+      </div>
+      <div class="form-group">
+        <label for="edit-category">Category</label>
+        <select id="edit-category">
+          <option value="FOUR_WHEELER">Four Wheeler</option>
+          <option value="TWO_WHEELER">Two Wheeler</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="edit-type">Type</label>
+        <select id="edit-type">
+          <option value="Sedan">Sedan</option>
+          <option value="SUV">SUV</option>
+          <option value="Truck">Truck</option>
+          <option value="Van">Van</option>
+          <option value="Luxury">Luxury</option>
+          <option value="Motorcycle">Motorcycle</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="edit-price">Price / Day (₹)</label>
+        <input type="number" id="edit-price" min="1" step="0.01">
+      </div>
+      <div class="form-group">
+        <label for="edit-rating">Rating</label>
+        <input type="number" id="edit-rating" min="0" max="5" step="0.1">
+      </div>
+      <div class="form-group">
+        <label for="edit-image">Image URL</label>
+        <input type="text" id="edit-image">
+      </div>
+      <div class="form-group">
+        <label for="edit-status">Status</label>
+        <select id="edit-status">
+          <option value="AVAILABLE">AVAILABLE</option>
+          <option value="RESERVED">RESERVED</option>
+          <option value="RENTED">RENTED</option>
+          <option value="MAINTENANCE">MAINTENANCE</option>
+        </select>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+        <button class="btn btn-primary"   onclick="saveVehicleEdit()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
+
+  <script src="app.js"></script>
+  <script>
+    window.onload = () => {
+      checkAuth('ADMIN');
+      loadAdminVehicles();
+      loadAdminReservations();
+      loadAdminUsers();
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,323 @@
+<!-- Navbar -->
+<nav class="navbar">
+  <a class="nav-brand" href="#">
+    <span class="brand-icon">🚗</span>
+    VehicleRent
+    <span class="admin-badge">Admin</span>
+  </a>
+  <div class="nav-right">
+    <button class="btn btn-sm btn-secondary" (click)="logout()">Sign Out</button>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- Stats Row -->
+  <div id="stats-row" class="stats-row">
+    <div class="stat-card">
+      <span class="stat-icon">🚗</span>
+      <div>
+        <div class="stat-label">Total Vehicles</div>
+        <div class="stat-value" id="stat-vehicles">{{ statVehiclesCount }}</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-icon">📋</span>
+      <div>
+        <div class="stat-label">Reservations</div>
+        <div class="stat-value" id="stat-reservations">{{ statReservationsCount }}</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-icon">👥</span>
+      <div>
+        <div class="stat-label">Customers</div>
+        <div class="stat-value" id="stat-users">{{ statUsersCount }}</div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-icon">✅</span>
+      <div>
+        <div class="stat-label">Available Now</div>
+        <div class="stat-value" id="stat-available">{{ statAvailableCount }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn" 
+            [class.active]="activeTab === 'panel-vehicles'" 
+            (click)="switchTab('panel-vehicles')">
+      🚗 Vehicles
+    </button>
+    <button class="tab-btn" 
+            [class.active]="activeTab === 'panel-reservations'" 
+            (click)="switchTab('panel-reservations')">
+      📋 Reservations
+    </button>
+    <button class="tab-btn" 
+            [class.active]="activeTab === 'panel-users'" 
+            (click)="switchTab('panel-users')">
+      👥 Users
+    </button>
+  </div>
+
+  <!-- ── Panel: Vehicles ── -->
+  <div id="panel-vehicles" class="tab-panel" [class.active]="activeTab === 'panel-vehicles'">
+    <div class="card">
+      <div class="card-title">➕ Add New Vehicle</div>
+      <div class="add-form">
+        <div class="form-group">
+          <label for="v-name">Vehicle Name</label>
+          <input type="text" id="v-name" placeholder="e.g. Toyota Camry" [(ngModel)]="vName">
+        </div>
+        <div class="form-group">
+          <label for="v-category">Category</label>
+          <select id="v-category" [(ngModel)]="vCategory">
+            <option value="FOUR_WHEELER">Four Wheeler</option>
+            <option value="TWO_WHEELER">Two Wheeler</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="v-type">Type</label>
+          <select id="v-type" [(ngModel)]="vType">
+            <option value="Sedan">Sedan</option>
+            <option value="SUV">SUV</option>
+            <option value="Truck">Truck</option>
+            <option value="Van">Van</option>
+            <option value="Luxury">Luxury</option>
+            <option value="Motorcycle">Motorcycle</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="v-price">Price/Day (₹)</label>
+          <input type="number" id="v-price" placeholder="e.g. 2000" min="1" step="0.01" [(ngModel)]="vPrice">
+        </div>
+        <div class="form-group">
+          <label for="v-rating">Rating</label>
+          <input type="number" id="v-rating" placeholder="e.g. 4.5" min="0" max="5" step="0.1" [(ngModel)]="vRating">
+        </div>
+        <div class="form-group">
+          <label for="v-image">Image URL</label>
+          <input type="text" id="v-image" placeholder="URL to vehicle image" [(ngModel)]="vImage">
+        </div>
+        <div class="form-group">
+          <label for="v-status">Status</label>
+          <select id="v-status" [(ngModel)]="vStatus">
+            <option value="AVAILABLE">AVAILABLE</option>
+            <option value="MAINTENANCE">MAINTENANCE</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" [disabled]="isAddingVehicle" (click)="addVehicle()">
+          {{ isAddingVehicle ? 'Adding...' : 'Add Vehicle' }}
+        </button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🚗 All Vehicles</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Category</th>
+              <th>Type</th>
+              <th>Price/Day</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="isLoadingVehicles">
+              <td colspan="7" class="loading-cell"><div class="loading-spinner small"></div></td>
+            </tr>
+            <tr *ngIf="!isLoadingVehicles && vehicles.length === 0">
+              <td colspan="7" class="empty-cell">No vehicles yet. Add one above.</td>
+            </tr>
+            <tr *ngFor="let v of vehicles">
+              <td><span class="id-chip">#{{ v.id }}</span></td>
+              <td><strong>{{ v.name }}</strong></td>
+              <td><small>{{ v.category }}</small></td>
+              <td>{{ v.type }}</td>
+              <td>₹{{ v.pricePerDay | number:'1.0-0' }}</td>
+              <td><span class="status-badge status-{{ v.status.toLowerCase() }}">{{ v.status }}</span></td>
+              <td class="action-cell">
+                <button class="btn btn-sm btn-secondary" (click)="openEditModal(v)">Edit</button>
+                <button class="btn btn-sm btn-danger" (click)="deleteVehicle(v.id)">Delete</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Panel: Reservations ── -->
+  <div id="panel-reservations" class="tab-panel" [class.active]="activeTab === 'panel-reservations'">
+    <div class="card">
+      <div class="card-title">📋 All Reservations</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Customer</th>
+              <th>Vehicle</th>
+              <th>Dates</th>
+              <th>Payment</th>
+              <th>Original</th>
+              <th>Discount</th>
+              <th>Final</th>
+              <th>Status</th>
+              <th>Update</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="isLoadingReservations">
+              <td colspan="10" class="loading-cell"><div class="loading-spinner small"></div></td>
+            </tr>
+            <tr *ngIf="!isLoadingReservations && reservations.length === 0">
+              <td colspan="10" class="empty-cell">No reservations yet.</td>
+            </tr>
+            <tr *ngFor="let r of reservations">
+              <td><span class="id-chip">#{{ r.id }}</span></td>
+              <td>
+                <strong>{{ r.customer?.name }}</strong><br>
+                <small class="text-muted">{{ r.customer?.email }}</small>
+              </td>
+              <td>
+                {{ r.vehicle?.name }}<br>
+                <small>({{ r.vehicle?.category }})</small>
+              </td>
+              <td>{{ r.startDate }} → {{ r.endDate }}</td>
+              <td>
+                <strong>{{ r.rental?.paymentMethod || '—' }}</strong><br>
+                <small class="{{ (r.rental?.paymentStatus || '').toLowerCase() }}">
+                  {{ r.rental?.paymentStatus || 'UNPAID' }}
+                </small>
+              </td>
+              <td>₹{{ (r.rental?.originalAmount || 0) | number:'1.0-0' }}</td>
+              <td style="color:var(--success)">
+                {{ r.rental?.discountAmount > 0 ? '-₹' + (r.rental.discountAmount | number:'1.0-0') : '—' }}
+              </td>
+              <td><strong>₹{{ (r.rental?.finalAmount || 0) | number:'1.0-0' }}</strong></td>
+              <td><span class="status-badge status-{{ r.status.toLowerCase() }}">{{ r.status }}</span></td>
+              <td>
+                <select class="status-select" 
+                        [ngModel]="r.status" 
+                        (change)="updateReservationStatus(r.id, $any($event.target).value)">
+                  <option value="">Change…</option>
+                  <option value="PENDING">PENDING</option>
+                  <option value="CONFIRMED">CONFIRMED</option>
+                  <option value="COMPLETED">COMPLETED</option>
+                  <option value="CANCELLED">CANCELLED</option>
+                </select>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Panel: Users ── -->
+  <div id="panel-users" class="tab-panel" [class.active]="activeTab === 'panel-users'">
+    <div class="card">
+      <div class="card-title">👥 Registered Users</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>License</th>
+              <th>Role</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngIf="isLoadingUsers">
+              <td colspan="5" class="loading-cell"><div class="loading-spinner small"></div></td>
+            </tr>
+            <tr *ngIf="!isLoadingUsers && users.length === 0">
+              <td colspan="5" class="empty-cell">No users registered yet.</td>
+            </tr>
+            <tr *ngFor="let u of users">
+              <td><span class="id-chip">#{{ u.id }}</span></td>
+              <td><strong>{{ u.name }}</strong></td>
+              <td>{{ u.email }}</td>
+              <td>
+                <span *ngIf="u.licenseNumber">{{ u.licenseNumber }}</span>
+                <span *ngIf="!u.licenseNumber" class="text-muted">—</span>
+              </td>
+              <td><span class="role-badge role-{{ u.role.toLowerCase() }}">{{ u.role }}</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<!-- Edit Vehicle Modal -->
+<div id="edit-modal" class="modal-overlay" [class.show]="isEditModalOpen">
+  <div class="modal-box" *ngIf="editId !== null">
+    <div class="modal-header">
+      <span class="modal-title">Edit Vehicle</span>
+      <button class="modal-close" (click)="closeEditModal()">✕</button>
+    </div>
+    <div class="form-group">
+      <label for="edit-name">Vehicle Name</label>
+      <input type="text" id="edit-name" [(ngModel)]="editName">
+    </div>
+    <div class="form-group">
+      <label for="edit-category">Category</label>
+      <select id="edit-category" [(ngModel)]="editCategory">
+        <option value="FOUR_WHEELER">Four Wheeler</option>
+        <option value="TWO_WHEELER">Two Wheeler</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="edit-type">Type</label>
+      <select id="edit-type" [(ngModel)]="editType">
+        <option value="Sedan">Sedan</option>
+        <option value="SUV">SUV</option>
+        <option value="Truck">Truck</option>
+        <option value="Van">Van</option>
+        <option value="Luxury">Luxury</option>
+        <option value="Motorcycle">Motorcycle</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="edit-price">Price / Day (₹)</label>
+      <input type="number" id="edit-price" min="1" step="0.01" [(ngModel)]="editPrice">
+    </div>
+    <div class="form-group">
+      <label for="edit-rating">Rating</label>
+      <input type="number" id="edit-rating" min="0" max="5" step="0.1" [(ngModel)]="editRating">
+    </div>
+    <div class="form-group">
+      <label for="edit-image">Image URL</label>
+      <input type="text" id="edit-image" [(ngModel)]="editImage">
+    </div>
+    <div class="form-group">
+      <label for="edit-status">Status</label>
+      <select id="edit-status" [(ngModel)]="editStatus">
+        <option value="AVAILABLE">AVAILABLE</option>
+        <option value="RESERVED">RESERVED</option>
+        <option value="RENTED">RENTED</option>
+        <option value="MAINTENANCE">MAINTENANCE</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="closeEditModal()">Cancel</button>
+      <button class="btn btn-primary" [disabled]="isSavingEdit" (click)="saveVehicleEdit()">
+        {{ isSavingEdit ? 'Saving...' : 'Save Changes' }}
+      </button>
+    </div>
+  </div>
+</div>

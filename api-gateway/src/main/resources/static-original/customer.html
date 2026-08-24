@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customer Dashboard — VehicleRent</title>
+  <meta name="description" content="Browse and book available vehicles. Manage your reservations.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a class="nav-brand" href="#">
+      <span class="brand-icon">🚗</span>
+      VehicleRent
+    </a>
+    <div class="nav-right">
+      <span class="nav-user">Welcome, <strong id="user-name">—</strong></span>
+      <button class="btn btn-sm btn-secondary" onclick="logout()">Sign Out</button>
+    </div>
+  </nav>
+
+  <div class="page">
+
+    <!-- Tab navigation -->
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="panel-vehicles" onclick="switchTab('panel-vehicles')">🚘 Available Vehicles</button>
+      <button class="tab-btn"       data-tab="panel-bookings"  onclick="switchTab('panel-bookings')">📋 My Bookings</button>
+    </div>
+
+    <!-- ── Panel: Available Vehicles ── -->
+    <div id="panel-vehicles" class="tab-panel active">
+
+      <!-- Category Selection Screen -->
+      <div id="selection-screen" class="selection-screen">
+        <div class="welcome-hero">
+          <h1>Find Your Perfect Ride</h1>
+          <p>Choose a category or get a recommendation based on your trip.</p>
+        </div>
+
+        <!-- Top Section: Recommendation & Policies -->
+        <div class="top-info-grid">
+          <!-- Recommendation Section -->
+          <div class="recommendation-card card">
+            <div class="card-title">✨ Smart Recommendation</div>
+            <div class="recommendation-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="trip-start">Start Location</label>
+                  <input type="text" id="trip-start" placeholder="e.g. Home, Office">
+                </div>
+                <div class="form-group">
+                  <label for="trip-end">End Location</label>
+                  <input type="text" id="trip-end" placeholder="e.g. Airport, Mall">
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="trip-distance">Distance (km)</label>
+                  <input type="number" id="trip-distance" placeholder="Enter distance">
+                </div>
+                <button class="btn btn-primary btn-full" onclick="getRecommendation()">Get Recommendation</button>
+              </div>
+            </div>
+            <div id="recommendation-result" class="recommendation-result hidden">
+              <div class="rec-icon" id="rec-icon">🚲</div>
+              <div class="rec-text">
+                <h4 id="rec-title">We recommend a Two Wheeler</h4>
+                <p id="rec-reason">Perfect for short distances and easy navigation.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Policies Section -->
+          <div class="policies-card card">
+            <div class="card-title">📜 Policies and Guidelines</div>
+            <ul class="policies-list">
+              <li>Renter must be 18 years or above.</li>
+              <li>Valid driving licence is mandatory.</li>
+              <li>Helmet is mandatory for two-wheelers.</li>
+              <li>Seat belt is mandatory for four-wheelers.</li>
+              <li>Vehicle must be returned on or before the selected return date.</li>
+              <li>Late return may include extra charges.</li>
+              <li>Customer is responsible for damage during rental period.</li>
+              <li>Fuel charges are not included unless mentioned.</li>
+              <li>Original ID proof may be required during pickup.</li>
+              <li>Drunk driving or rash driving is strictly prohibited.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="category-grid">
+          <div class="cat-card" onclick="selectCategory('FOUR_WHEELER')">
+            <div class="cat-img" style="background-image: url('https://images.unsplash.com/photo-1494976388531-d1058494cdd8?w=800')"></div>
+            <div class="cat-info">
+              <h3>Four Wheeler</h3>
+              <p>Comfortable cars for long trips and families.</p>
+              <span class="btn btn-sm btn-primary">Browse Cars</span>
+            </div>
+          </div>
+          <div class="cat-card" onclick="selectCategory('TWO_WHEELER')">
+            <div class="cat-img" style="background-image: url('https://images.unsplash.com/photo-1558981403-c5f97cb94ad2?w=800')"></div>
+            <div class="cat-info">
+              <h3>Two Wheeler</h3>
+              <p>Fast and agile bikes for city commuting.</p>
+              <span class="btn btn-sm btn-primary">Browse Bikes</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vehicle Listing (Hidden by default) -->
+      <div id="listing-screen" class="listing-screen hidden">
+        <div class="listing-header">
+          <button class="btn btn-sm btn-secondary" onclick="backToSelection()">← Back to Categories</button>
+          <h2 id="category-title">All Vehicles</h2>
+        </div>
+
+        <!-- Date search -->
+        <div class="search-bar">
+          <div class="form-group">
+            <label for="search-start">From Date</label>
+            <input type="date" id="search-start">
+          </div>
+          <div class="form-group">
+            <label for="search-end">To Date</label>
+            <input type="date" id="search-end">
+          </div>
+          <button class="btn btn-primary" id="search-btn" onclick="loadAvailableVehicles()">Search</button>
+          <button class="btn btn-secondary" onclick="clearSearch()">Clear</button>
+        </div>
+
+        <!-- Vehicle grid -->
+        <div id="vehicles-grid" class="vehicle-grid">
+          <div class="empty-state"><div class="loading-spinner"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Panel: My Bookings ── -->
+    <div id="panel-bookings" class="tab-panel">
+      <div class="card">
+        <div class="card-title">📋 My Reservation History</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Vehicle</th>
+                <th>Start Date</th>
+                <th>End Date</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="reservations-tbody">
+              <tr><td colspan="6" class="loading-cell"><div class="loading-spinner small"></div></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /page -->
+
+  <!-- Booking Modal -->
+  <div id="booking-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <span class="modal-title">Book Vehicle</span>
+        <button class="modal-close" onclick="closeBookingModal()">✕</button>
+      </div>
+
+      <div class="modal-vehicle-info">
+        <h3 id="modal-vehicle-name">—</h3>
+        <p id="modal-price-per-day">₹0.00 / day</p>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="book-start-date">Start Date</label>
+          <input type="date" id="book-start-date" onchange="updatePricePreview()">
+        </div>
+        <div class="form-group">
+          <label for="book-end-date">End Date</label>
+          <input type="date" id="book-end-date" onchange="updatePricePreview()">
+        </div>
+      </div>
+
+      <div class="coupon-section card">
+        <div class="form-group">
+          <label for="book-coupon">Coupon Code</label>
+          <div class="input-with-btn">
+            <input type="text" id="book-coupon" placeholder="e.g. FIRST15">
+            <button class="btn btn-sm btn-secondary" onclick="updatePricePreview()">Apply</button>
+          </div>
+          <small class="hint">Use <strong>FIRST15</strong> for 15% off on your first 3 bookings!</small>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="book-payment">Payment Method</label>
+        <select id="book-payment" class="form-control">
+          <option value="">-- Select Payment Option --</option>
+          <optgroup label="Popular UPI">
+            <option value="GPAY">Google Pay (GPay)</option>
+            <option value="PHONEPE">PhonePe</option>
+            <option value="PAYTM">Paytm</option>
+          </optgroup>
+          <optgroup label="Others">
+            <option value="UPI">Other UPI ID</option>
+            <option value="CARD">Credit / Debit Card</option>
+            <option value="NET_BANKING">Net Banking</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <div class="price-preview-box" id="price-preview">
+        Select dates to see the total cost.
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeBookingModal()">Cancel</button>
+        <button class="btn btn-primary" id="confirm-book-btn" onclick="submitBooking()">Confirm & Pay</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
+
+  <script src="app.js"></script>
+  <script>
+    window.onload = () => {
+      checkAuth('CUSTOMER');
+      // Show welcome name from token claims stored at login
+      const stored = localStorage.getItem('name');
+      if (stored) document.getElementById('user-name').textContent = stored;
+      // Set min date to today for search inputs
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('search-start').min = today;
+      document.getElementById('search-end').min   = today;
+      
+      loadMyReservations();
+    };
+  </script>
+</body>
+</html>

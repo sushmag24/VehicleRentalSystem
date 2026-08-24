@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vehicle Rental System — Sign In</title>
+  <meta name="description" content="Rent premium vehicles at unbeatable rates. Sign in or create an account to get started.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="auth-page">
+
+  <div class="auth-box">
+    <!-- Brand -->
+    <div class="auth-logo">
+      <span class="logo-icon">🚗</span>
+      <h1>VehicleRent</h1>
+      <p>Premium Vehicle Rental Platform</p>
+    </div>
+
+    <!-- Tab switcher -->
+    <div class="auth-tabs">
+      <button id="tab-login"    class="auth-tab active" onclick="showLogin()">Sign In</button>
+      <button id="tab-register" class="auth-tab"        onclick="showRegister()">Register</button>
+    </div>
+
+    <!-- Login Panel -->
+    <div id="login-panel" class="auth-panel active">
+      <div class="form-group">
+        <label for="login-email">Email Address</label>
+        <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label for="login-password">Password</label>
+        <input type="password" id="login-password" placeholder="••••••••"
+               autocomplete="current-password" onkeydown="if(event.key==='Enter') login()">
+      </div>
+      <button id="login-btn" class="btn btn-primary btn-full" onclick="login()">Sign In</button>
+      <p style="text-align:center;margin-top:1rem;font-size:0.85rem;color:var(--text-2)">
+        Default admin: <code style="color:var(--accent)">admin@vehiclerental.com</code> /
+        <code style="color:var(--accent)">admin123</code>
+      </p>
+    </div>
+
+    <!-- Register Panel -->
+    <div id="register-panel" class="auth-panel">
+      <div class="form-group">
+        <label for="reg-name">Full Name</label>
+        <input type="text" id="reg-name" placeholder="John Smith" autocomplete="name">
+      </div>
+      <div class="form-group">
+        <label for="reg-email">Email Address</label>
+        <input type="email" id="reg-email" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label for="reg-password">Password</label>
+        <input type="password" id="reg-password" placeholder="Min. 6 characters" autocomplete="new-password">
+      </div>
+      <div class="form-group">
+        <label for="reg-license">Driver's License Number</label>
+        <input type="text" id="reg-license" placeholder="DL-1234567890">
+      </div>
+      <button id="register-btn" class="btn btn-primary btn-full" onclick="register()">Create Account</button>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

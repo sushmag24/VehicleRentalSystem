@@ -1,0 +1,11 @@
+<router-outlet></router-outlet>
+
+<!-- Toast -->
+<div id="toast" class="toast" 
+     [class.show]="toast.show" 
+     [class.toast-success]="toast.type === 'success'" 
+     [class.toast-error]="toast.type === 'error'"
+     [class.toast-warning]="toast.type === 'warning'"
+     [class.toast-info]="toast.type === 'info'">
+  {{ toast.message }}
+</div>
