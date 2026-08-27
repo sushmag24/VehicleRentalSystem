@@ -6,7 +6,9 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class AuthService {
-  private api = 'http://localhost:8080/api';
+  private api = (typeof window !== 'undefined' && window.location.hostname === 'localhost' && window.location.port === '4200')
+    ? 'http://localhost:8080/api'
+    : '/api';
 
   constructor(private http: HttpClient) {}
 

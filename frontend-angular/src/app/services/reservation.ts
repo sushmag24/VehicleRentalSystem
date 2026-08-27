@@ -7,7 +7,9 @@ import { AuthService } from './auth';
   providedIn: 'root'
 })
 export class ReservationService {
-  private api = 'http://localhost:8080/api';
+  private api = (typeof window !== 'undefined' && window.location.hostname === 'localhost' && window.location.port === '4200')
+    ? 'http://localhost:8080/api'
+    : '/api';
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
